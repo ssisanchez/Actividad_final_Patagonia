@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capacitación Meteorológica - Brigadistas Patagonia</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 850px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; font-size: 24px; }
+        h2 { color: #2980b9; border-bottom: 2px solid #eee; padding-bottom: 10px; font-size: 20px;}
+        
+        /* Navegación entre pantallas */
+        .screen { display: none; }
+        .screen.active { display: block; }
+        
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; }
+        input[type="text"], select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-family: inherit; }
+        
+        /* Botones */
+        .btn { background-color: #2980b9; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; transition: 0.3s;}
+        .btn:hover { background-color: #3498db; }
+        .btn-success { background-color: #27ae60; width: 100%; font-size: 18px; padding: 15px; margin-top: 20px; display: none;}
+        .btn-success:hover { background-color: #2ecc71; }
+        .btn-back { background-color: #7f8c8d; }
+        .btn-back:hover { background-color: #95a5a6; }
+        
+        /* Grilla del Menú Principal */
+        .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .menu-card { background: #fdfdfd; border: 2px solid #bdc3c7; border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .menu-card:hover { border-color: #2980b9; box-shadow: 0 4px 8px rgba(41, 128, 185, 0.2); }
+        .menu-card h3 { margin-top: 0; color: #2c3e50; }
+        .menu-card.completed { border-color: #27ae60; background-color: #eafaf1; pointer-events: none; opacity: 0.8; }
+        .menu-card.completed::after { content: " ✔ Completado"; color: #27ae60; font-weight: bold; display: block; margin-top: 10px;}
+        
+        .situation-box { background-color: #e8f4f8; padding: 15px; border-left: 5px solid #2980b9; border-radius: 4px; margin-bottom: 20px; line-height: 1.5;}
+        
+        /* Controles de alineación */
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 20px; }
+        
+        @media (max-width: 600px) {
+            .grid-menu { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Taller de Información Meteorológica - Actividad Final</h1>
+    
+    <!-- El formulario envuelve toda la página para recolectar los datos al final -->
+    <form id="tallerForm" action="URL_DE_FORMSPREE_AQUI" method="POST">
+        
+        <!-- PANTALLA 1: INGRESO -->
+        <div id="screen-login" class="screen active">
+            <h2>Identificación del Participante</h2>
+            <p>Completá tus datos para ingresar al panel de situaciones operativas.</p>
+            <div class="form-group">
+                <label for="nombre">Nombre y Apellido:</label>
+                <input type="text" id="nombre" name="nombre" required>
+            </div>
+            <div class="form-group">
+                <label for="lugar">Lugar de Residencia / Base:</label>
+                <select id="lugar" name="lugar" required>
+                    <option value="">Seleccioná tu localidad...</option>
+                    <option value="El Bolsón">El Bolsón</option>
+                    <option value="Mallín Ahogado">Mallín Ahogado</option>
+                    <option value="Lago Puelo">Lago Puelo (Las Golondrinas)</option>
+                    <option value="El Hoyo">El Hoyo</option>
+                    <option value="Epuyén">Epuyén</option>
+                    <option value="El Maitén">El Maitén</option>
+                    <option value="Cholila">Cholila</option>
+                    <option value="Cerro Radal">Cerro Radal</option>
+                    <option value="Corcovado">Corcovado</option>
+                    <option value="Villa Turismo">Villa Turismo</option>
+                    <option value="Costa del Río Azul">Costa del Río Azul</option>
+                    <option value="Los Repollos">Los Repollos</option>
+                    <option value="Paraje Entre Ríos">Paraje Entre Ríos</option>
+                    <option value="San Marcos Sierras">San Marcos Sierras</option>
+                </select>
+            </div>
+            <div style="text-align: right;">
+                <button type="button" class="btn" onclick="iniciarActividad()">Ingresar al Panel</button>
+            </div>
+        </div>
+
+        <!-- PANTALLA 2: MENÚ PRINCIPAL (HUB) -->
+        <div id="screen-hub" class="screen">
+            <h2>Panel de Situaciones Operativas</h2>
+            <p>Seleccioná y analizá los 4 escenarios meteorológicos. Una vez completados todos, podrás enviar tu reporte.</p>
+            
+            <div class="grid-menu">
+                <div id="card-1" class="menu-card" onclick="irASituacion(1)">
+                    <h3>Situación 1</h3>
+                    <p>Frente Frío con Alerta Temprana</p>
+                </div>
+                <div id="card-2" class="menu-card" onclick="irASituacion(2)">
+                    <h3>Situación 2</h3>
+                    <p>Alta Presión Post Frontal</p>
+                </div>
+                <div id="card-3" class="menu-card" onclick="irASituacion(3)">
+                    <h3>Situación 3</h3>
+                    <p>Mesoescala: Circulación de Valle</p>
+                </div>
+                <div id="card-4" class="menu-card" onclick="irASituacion(4)">
+                    <h3>Situación 4</h3>
+                    <p>Tormenta de Verano (Seca)</p>
+                </div>
+            </div>
+
+            <button type="submit" id="btn-submit" class="btn btn-success">Enviar Reporte Final</button>
+        </div>
+
+        <!-- PANTALLA SITUACIÓN 1 -->
+        <div id="screen-sit1" class="screen">
+            <h2>Situación 1: Frente Frío</h2>
+            <div class="situation-box">
+                <strong>El Escenario:</strong> El SMN emitió una alerta amarilla. Se espera el pasaje inminente de un sistema frontal frío en las próximas horas. Actualmente hay viento persistente del sector Norte y temperaturas muy elevadas.
+            </div>
+            <div class="form-group">
+                <label>Trivia Meteorológica: ¿Qué cambio a gran escala dominará inmediatamente tras el paso del frente?</label>
+                <select name="q1_frente" id="q1_frente">
+                    <option value="">Seleccionar...</option>
+                    <option value="Rotación al Sur con ráfagas y descenso de temperatura">Rotación brusca del viento al sector Sur/Suroeste con ráfagas y descenso de temperatura.</option>
+                    <option value="Aumento de temperatura y calma">Aumento extremo de la temperatura y disminución paulatina del viento.</option>
+                    <option value="Rotación al Este sin ráfagas">El viento rotará al Este aportando humedad constante pero sin ráfagas.</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Decisión Operativa:</label>
+                <p style="font-size: 14px; color: #555;">Teniendo en cuenta el comportamiento del fuego ante un cambio repentino de viento, ¿qué acciones de seguridad y repliegue priorizarían antes de que llegue el frente?</p>
+                <textarea name="d1_frente" id="d1_frente" rows="4"></textarea>
+            </div>
+            <div class="nav-buttons">
+                <button type="button" class="btn btn-back" onclick="volverAlHub()">Cancelar</button>
+                <button type="button" class="btn" onclick="guardarSituacion(1)">Guardar y Volver al Panel</button>
+            </div>
+        </div>
+
+        <!-- PANTALLA SITUACIÓN 2 -->
+        <div id="screen-sit2" class="screen">
+            <h2>Situación 2: Alta Post Frontal</h2>
+            <div class="situation-box">
+                <strong>El Escenario:</strong> El frente frío ya pasó. Ahora domina un sistema de Alta Presión (anticiclón) muy fuerte sobre la cordillera, generando gran estabilidad atmosférica y subsidencia térmica.
+            </div>
+            <div class="form-group">
+                <label>Trivia Meteorológica: ¿Cómo impacta esta fuerte estabilidad atmosférica en la noche y madrugada?</label>
+                <select name="q2_alta" id="q2_alta">
+                    <option value="">Seleccionar...</option>
+                    <option value="Inversiones térmicas y atrapamiento de humo">Provoca inversiones térmicas, atrapando el aire frío y el humo en el fondo del valle, reduciendo la visibilidad.</option>
+                    <option value="Columnas inmensas y pavesas">Genera columnas convectivas inmensas que ascienden sin freno esparciendo pavesas.</option>
+                    <option value="Vientos de más de 50km/h">Incrementa el viento en superficie a más de 50 km/h sostenidos en los valles.</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Decisión Operativa:</label>
+                <p style="font-size: 14px; color: #555;">Sabiendo que el humo quedará estancado y el aire frío descenderá, ¿dónde ubicarían el campamento y cómo organizarían las tareas matutinas considerando la visibilidad?</p>
+                <textarea name="d2_alta" id="d2_alta" rows="4"></textarea>
+            </div>
+            <div class="nav-buttons">
+                <button type="button" class="btn btn-back" onclick="volverAlHub()">Cancelar</button>
+                <button type="button" class="btn" onclick="guardarSituacion(2)">Guardar y Volver al Panel</button>
+            </div>
+        </div>
+
+        <!-- PANTALLA SITUACIÓN 3 -->
+        <div id="screen-sit3" class="screen">
+            <h2>Situación 3: Mesoescala (Circulaciones Locales)</h2>
+            <div class="situation-box">
+                <strong>El Escenario:</strong> Día cálido sin viento sinóptico dominante. Son las 15:00 hs, el sol calienta intensamente el fondo de un valle y sus laderas adyacentes.
+            </div>
+            <div class="form-group">
+                <label>Trivia Meteorológica: Según el ciclo diario, ¿qué circulación local dominará a esta hora?</label>
+                <select name="q3_meso" id="q3_meso">
+                    <option value="">Seleccionar...</option>
+                    <option value="Viento anabático">Viento de valle y ladera (anabático): el aire cálido asciende paralelo a las laderas hacia las cumbres.</option>
+                    <option value="Viento catabático">Viento catabático: el aire frío desciende bruscamente de las cumbres hacia el valle.</option>
+                    <option value="Calma">La radiación solar anula los vientos, dejando la zona en calma total.</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Decisión Operativa:</label>
+                <p style="font-size: 14px; color: #555;">El fuego tiende a trepar empujado por esta brisa ascendente de media tarde. ¿Hacia dónde desplegarían el personal y qué zonas de la ladera evitarían?</p>
+                <textarea name="d3_meso" id="d3_meso" rows="4"></textarea>
+            </div>
+            <div class="nav-buttons">
+                <button type="button" class="btn btn-back" onclick="volverAlHub()">Cancelar</button>
+                <button type="button" class="btn" onclick="guardarSituacion(3)">Guardar y Volver al Panel</button>
+            </div>
+        </div>
+
+        <!-- PANTALLA SITUACIÓN 4 -->
+        <div id="screen-sit4" class="screen">
+            <h2>Situación 4: Tormenta de Verano</h2>
+            <div class="situation-box">
+                <strong>El Escenario:</strong> Jornada de extremo calor. Mucha inestabilidad desarrolla nubes cumulonimbus. Sin embargo, la humedad relativa en superficie es del 15% y la precipitación no llega al suelo (virga).
+            </div>
+            <div class="form-group">
+                <label>Trivia Meteorológica: ¿Cuál es el riesgo principal de este sistema (Tormenta Seca) para los incendios?</label>
+                <select name="q4_tormenta" id="q4_tormenta">
+                    <option value="">Seleccionar...</option>
+                    <option value="Rayos y downbursts secos">Caída de rayos sobre combustible reseco (ignición directa) y ráfagas descendentes impredecibles (downbursts).</option>
+                    <option value="Sofocación parcial">Aumento sostenido de la humedad ambiente que ralentiza el avance de las llamas.</option>
+                    <option value="Frentes cálidos">Generación inmediata de un frente cálido que arrastra el fuego hacia el norte.</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Decisión Operativa:</label>
+                <p style="font-size: 14px; color: #555;">Ante actividad eléctrica y riesgo de ráfagas erráticas en todas direcciones, ¿qué instrucciones de repliegue o seguridad imparten a las cuadrillas en línea?</p>
+                <textarea name="d4_tormenta" id="d4_tormenta" rows="4"></textarea>
+            </div>
+            <div class="nav-buttons">
+                <button type="button" class="btn btn-back" onclick="volverAlHub()">Cancelar</button>
+                <button type="button" class="btn" onclick="guardarSituacion(4)">Guardar y Volver al Panel</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<script>
+    // Variables de control para saber qué situaciones ya se respondieron
+    let completadas = { 1: false, 2: false, 3: false, 4: false };
+
+    function cambiarPantalla(idDestino) {
+        let pantallas = document.getElementsByClassName('screen');
+        for (let i = 0; i < pantallas.length; i++) {
+            pantallas[i].classList.remove('active');
+        }
+        document.getElementById(idDestino).classList.add('active');
+    }
+
+    function iniciarActividad() {
+        let nombre = document.getElementById('nombre').value;
+        let lugar = document.getElementById('lugar').value;
+        
+        if(nombre.trim() === "" || lugar === "") {
+            alert("Por favor completá tu nombre y localidad para continuar.");
+            return;
+        }
+        cambiarPantalla('screen-hub');
+    }
+
+    function irASituacion(num) {
+        cambiarPantalla('screen-sit' + num);
+    }
+
+    function volverAlHub() {
+        cambiarPantalla('screen-hub');
+    }
+
+    function guardarSituacion(num) {
+        // Validar que respondieron las dos cosas
+        let q = document.querySelector(`#screen-sit${num} select`).value;
+        let d = document.querySelector(`#screen-sit${num} textarea`).value;
+
+        if(q === "" || d.trim() === "") {
+            alert("Por favor seleccioná una opción en la trivia y escribí tu decisión operativa.");
+            return;
+        }
+
+        // Marcar como completada
+        completadas[num] = true;
+        
+        // Cambiar estilo de la tarjeta en el panel
+        let card = document.getElementById('card-' + num);
+        card.classList.add('completed');
+
+        // Revisar si todas están listas
+        verificarFinalizacion();
+        
+        volverAlHub();
+    }
+
+    function verificarFinalizacion() {
+        if (completadas[1] && completadas[2] && completadas[3] && completadas[4]) {
+            document.getElementById('btn-submit').style.display = 'block';
+        }
+    }
+</script>
+
+</body>
+</html>
